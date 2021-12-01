@@ -1,0 +1,72 @@
+{
+  "id": "2911558",
+  "name": "pdf-viewer",
+  "font_family": "iconfont",
+  "css_prefix_text": "pdf-viewer--",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "25497851",
+      "name": "高度",
+      "font_class": "fullpage",
+      "unicode": "e9c4",
+      "unicode_decimal": 59844
+    },
+    {
+      "icon_id": "1048890",
+      "name": "减少",
+      "font_class": "minus",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "1206330",
+      "name": "设计目录",
+      "font_class": "catalog",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "1722990",
+      "name": "下载",
+      "font_class": "download",
+      "unicode": "e7bd",
+      "unicode_decimal": 59325
+    },
+    {
+      "icon_id": "2939198",
+      "name": "加减组件 加号",
+      "font_class": "plus",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
+      "icon_id": "4138746",
+      "name": "旋转",
+      "font_class": "rotate",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "6403457",
+      "name": "dots",
+      "font_class": "dots",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "6745215",
+      "name": "高度",
+      "font_class": "auto-width",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "7577336",
+      "name": "24gf-printer",
+      "font_class": "printer",
+      "unicode": "e9c3",
+      "unicode_decimal": 59843
+    }
+  ]
+}
