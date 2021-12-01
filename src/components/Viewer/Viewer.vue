@@ -83,7 +83,7 @@ export default {
   },
   data() {
     return {
-      document: null,
+      pdf: null,
       viewerContentHeight: 0,
       viewportHeight: 0,
       viewportWidth: 0,
@@ -213,10 +213,10 @@ export default {
       })
     },
     startLoading() {
-      this.$emit('isLoading', true)
+      this.$emit('update:isLoading', true)
     },
     endLoading() {
-      this.$emit('isLoading', false)
+      this.$emit('update:isLoading', false)
     },
     handleSwitchPage(page) {
       this.$emit('update:page', page)
@@ -231,6 +231,11 @@ export default {
         this.$emit('update:filename', filename)
 
         const documentLoadingTask = PDF.getDocument(this.source)
+        // const documentLoadingTask = PDF.getDocument({
+        //   url: this.source,
+        //   cMapPacked: true,
+        //   cMapUrl: 'https://unpkg.com/browse/pdfjs-dist@2.2.228/cmaps/',
+        // })
         documentLoadingTask.onPassword = (callback, reason) => {
           const retry = reason === PDF.PasswordResponses.INCORRECT_PASSWORD
           this.$emit('password-requested', {
@@ -238,20 +243,20 @@ export default {
             retry,
           })
         }
-        this.document = await documentLoadingTask.promise
+        this.pdf = await documentLoadingTask.promise
 
         this.$emit('loaded', {
-          total: this.document.numPages,
+          total: this.pdf.numPages,
         })
       } catch (e) {
-        this.document = null
+        this.pdf = null
         this.$emit('loading-failed', e)
       } finally {
         this.endLoading()
       }
     },
     async render() {
-      if (!this.document) {
+      if (!this.pdf) {
         return
       }
       try {
@@ -259,7 +264,7 @@ export default {
 
         await Promise.all(
           this.pages.map(async (pageNum, i) => {
-            const page = await this.document.getPage(pageNum)
+            const page = await this.pdf.getPage(pageNum)
             const pageWidth = page.view[2]
             const containerWidth = this.$el.clientWidth
             const targetWidth = containerWidth * 0.9
@@ -300,7 +305,7 @@ export default {
         await this.$nextTick()
         this.viewerContentHeight = this.$refs.viewerContent.clientHeight
       } catch (e) {
-        this.document = null
+        this.pdf = null
         this.$emit('rendering-failed', e)
       }
     },

@@ -20,7 +20,7 @@
     <div class="pdf-viewer__body">
       <div class="loading-mask" v-if="isLoading">
         <slot name="loading">
-          <div class="loading-content">Loading...</div>
+          <div class="loading-content">Loading {{dotText}}</div>
         </slot>
       </div>
       <Viewer
@@ -42,8 +42,6 @@
         @rendered="handleDocumentRender"
       />
     </div>
-
-    <iframe ref="iframe" style="display: none" />
   </div>
 </template>
 
@@ -92,9 +90,16 @@ export default {
       rotate: 0,
       isFullpage: false,
       filename: '',
+      seconds: 0,
     }
   },
   computed: {
+    dotText() {
+      const len = this.seconds % 3 + 1
+      const dot = '.'
+
+      return dot.repeat(len)
+    },
     viewerStyle() {
       return {
         visibility: this.isLoading ? 'hidden' : 'visible',
@@ -136,6 +141,15 @@ export default {
     },
     handleUpdateLoadingState(isLoading) {
       this.isLoading = isLoading
+      
+      if (this.$slots.loading) return
+      this._timer && clearInterval(this._timer)
+      if (isLoading) {
+        this.seconds = 0
+        this._timer = setInterval(() => {
+          this.seconds += 1
+        }, 500)
+      }
     },
     handlePasswordRequest({ callback, retry }) {
       // TODO: slot dialog ?

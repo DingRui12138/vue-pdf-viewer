@@ -8,7 +8,7 @@ export default {
   },
   render(h) {
     return h('iframe', {
-      on: { load: this.renderChildren },
+      on: { load: this.handleRenderChildren },
       style: { width: '100%', height: '100%', border: 'none' },
     })
   },
@@ -21,12 +21,36 @@ export default {
     getContentWindow() {
       return this.$el.contentWindow
     },
+    appendHead() {
+      const metaList = [
+        {
+          'http-equiv': 'content-type',
+          content: 'text/html; charset=UTF-8',
+        },
+        {
+          name: 'referrer',
+          content: 'no-referrer-when-downgrade',
+        },
+      ]
+
+      metaList.forEach(meta => {
+        const metaEl = document.createElement('META')
+
+        Object.keys(meta).forEach(k => {
+          metaEl[k] = meta[k]
+        })
+
+        this.$el.contentDocument.head.appendChild(metaEl)
+      })
+    },
     appendStyle(style) {
       const cssEl = document.createElement('STYLE')
       cssEl.textContent = style
+
       this.$el.contentDocument.head.appendChild(cssEl)
     },
-    renderChildren() {
+    handleRenderChildren() {
+      this.appendHead()
       // inject iframe styles
       this.appendStyle(style)
       if (this.css) {
