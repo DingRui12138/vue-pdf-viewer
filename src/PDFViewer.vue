@@ -1,6 +1,6 @@
 <template>
   <div class="pdf-viewer" @contextmenu="handlePreventDefault">
-    <div class="pdf-viewer__header">
+    <div class="pdf-viewer__header" :class="{ 'not-ready': !isReady }">
       <ViewerPageSelector
         :total="total"
         :page.sync="page"
@@ -9,6 +9,7 @@
         :rotate.sync="rotate"
         :isFullpage="isFullpage"
         :filename="filename"
+        :isReady="isReady"
         @toggleFullpage="handleToggleFullpage"
         @update:zoom="handleUpdateZoom"
         @toggleCatalog="handleToggleCatalog"
@@ -18,9 +19,16 @@
     </div>
 
     <div class="pdf-viewer__body">
-      <div class="loading-mask" v-if="isLoading">
+      <div class="loading-mask" v-if="isLoading || isRendering">
         <slot name="loading">
-          <div class="loading-content">Loading {{dotText}}</div>
+          <div class="loading-content" v-if="isLoading">
+            {{ loadingContent }}
+          </div>
+        </slot>
+        <slot name="rendering">
+          <div class="rendering-content" v-if="isRendering">
+            {{ renderingContent }}
+          </div>
         </slot>
       </div>
       <Viewer
@@ -36,6 +44,7 @@
         :filename.sync="filename"
         @update:zoom="handleUpdateZoom"
         @update:isLoading="handleUpdateLoadingState"
+        @update:isRendering="handleUpdateRenderingState"
         @password-requested="handlePasswordRequest"
         @loaded="handleLoaded"
         @loading-failed="handleLoadingFailed"
@@ -83,6 +92,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      isRendering: false,
       page: 1,
       total: 1,
       catalogVisible: true,
@@ -94,8 +104,20 @@ export default {
     }
   },
   computed: {
+    isReady() {
+      return !this.isLoading && !this.isRendering
+    },
+    status() {
+      return [this.isLoading, this.isRendering]
+    },
+    loadingContent() {
+      return `${this.loadingText || 'Loading'} ${this.dotText}`
+    },
+    renderingContent() {
+      return `${this.renderingText || 'Rendering'} ${this.dotText}`
+    },
     dotText() {
-      const len = this.seconds % 3 + 1
+      const len = (this.seconds % 3) + 1
       const dot = '.'
 
       return dot.repeat(len)
@@ -106,9 +128,36 @@ export default {
       }
     },
   },
+  watch: {
+    status: {
+      handler(n) {
+        const [isLoading, isRendering] = n
+        const startTimer = () => {
+          this._timer && clearInterval(this._timer)
+          this.seconds = 0
+
+          this._timer = setInterval(() => {
+            this.seconds += 1
+          }, 500)
+        }
+
+        if (isLoading) {
+          if (this.$slots.loading) return
+          startTimer()
+        } else if (isRendering) {
+          if (this.$slots.rendering) return
+          startTimer()
+        }
+      },
+    },
+    deep: true,
+  },
   methods: {
     handleDownload() {
-      this.$emit('download', this.source)
+      this.$emit('download', {
+        src: this.source,
+        filename: this.filename,
+      })
     },
     handlePrint() {
       this.$refs.viewer.print()
@@ -134,22 +183,16 @@ export default {
 
       this.total = total
       this.$emit('loaded', params)
+      this.isLoading = false
     },
     handleDocumentRender() {
-      this.isLoading = false
       this.$emit('rendered')
+    },
+    handleUpdateRenderingState(isRendering) {
+      this.isRendering = isRendering
     },
     handleUpdateLoadingState(isLoading) {
       this.isLoading = isLoading
-      
-      if (this.$slots.loading) return
-      this._timer && clearInterval(this._timer)
-      if (isLoading) {
-        this.seconds = 0
-        this._timer = setInterval(() => {
-          this.seconds += 1
-        }, 500)
-      }
     },
     handlePasswordRequest({ callback, retry }) {
       // TODO: slot dialog ?
@@ -207,6 +250,17 @@ export default {
     padding: 0 16px;
     box-shadow: 0px 3px 10px 2px black;
     z-index: 999;
+    &.not-ready {
+      position: relative;
+      &::after {
+        content: '';
+        height: 100%;
+        width: 100%;
+        display: inline-block;
+        position: absolute;
+        z-index: 1;
+      }
+    }
   }
 
   &__body {
@@ -222,7 +276,9 @@ export default {
       height: 100%;
       width: 100%;
       pointer-events: none;
-      .loading-content {
+      background: #a9a9a9;
+      .loading-content,
+      .rendering-content {
         height: 100%;
         width: 100%;
         display: flex;

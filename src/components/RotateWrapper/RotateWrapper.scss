@@ -1,0 +1,15 @@
+.rotate-wrapper {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  .image {
+    position: absolute;
+    width: 100%;
+  }
+  &::after {
+    content: '';
+    width: var(--content-width);
+    height: var(--content-height);
+    display: inline-block;
+  }
+}

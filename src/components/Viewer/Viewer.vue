@@ -1,5 +1,5 @@
 <template>
-  <IFrame :css="$options.style" ref="iframe">
+  <IFrame :css="$options.viewerStyle" ref="iframe">
     <div class="viewer-container" ref="container">
       <div
         class="scroller catalog"
@@ -8,21 +8,22 @@
           visible: catalogVisible,
         }"
       >
-        <div class="catalog-content" ref="catalogContent">
+        <div class="catalog-container">
           <div
             ref="catalogItem"
             v-for="page in pages"
             class="catalog-item"
             :key="page"
           >
-            <div class="test" :style="thumbnailItemStyle">
-              <canvas
-                ref="catalogCanvas"
-                class="canvas"
+            <div>
+              <div
+                ref="catalogItemContent"
+                class="catalog-item__content"
                 :class="activePage === page && 'active'"
-                :style="thumbnailStyle"
                 @click="handleSwitchPage(page)"
-              />
+              >
+                <RotateWrapper :src="imageList[page - 1]" :rotateDeg="rotate" />
+              </div>
             </div>
             <div class="catalog-index">
               {{ page }}
@@ -38,12 +39,22 @@
       >
         <div class="viewer-content" ref="viewerContent">
           <div
+            ref="viewerItem"
             v-for="page in pages"
             :key="page"
             class="viewer-item"
-            :style="viewerItemStyle"
           >
-            <canvas ref="viewerCanvas" class="canvas" :style="viewerStyle" />
+            <div :style="viewerStyle">
+              <span class="placeholder"></span>
+            </div>
+
+            <!-- TODO: use rotate wrapper -->
+            <!-- <RotateWrapper
+              :src="viewerImageList[page - 1]"
+              :rotateDeg="rotate"
+              :style="viewerStyle"
+              :duration="200"
+            /> -->
           </div>
         </div>
       </div>
@@ -56,12 +67,21 @@ import * as PDF from 'pdfjs-dist/es5/build/pdf.js'
 import PDFWorker from 'pdfjs-dist/es5/build/pdf.worker.js'
 import IFrame from '../IFrame/IFrame.vue'
 import throttle from '../../utils/throttle'
-import style from '!!css-loader!!sass-loader!./Viewer.scss'
+import viewerStyle from '!!css-loader!!sass-loader!./Viewer.scss'
+import getPageBlobList from './getPageBlobList.js'
+import RotateWrapper from '../RotateWrapper/RotateWrapper.vue'
+import rotateWrapperStyle from '!!css-loader!!sass-loader!../RotateWrapper/RotateWrapper.scss'
 
 PDF.GlobalWorkerOptions.workerPort = new PDFWorker()
 
 const MARGIN_OFFSET = 20
 const NORMAL_RATIO = 2
+
+const replacePlaceholder = (container, target) => {
+  const placeholder = container.querySelector('.placeholder')
+
+  placeholder.replaceWith(target)
+}
 
 export default {
   name: 'Viewer',
@@ -77,9 +97,11 @@ export default {
       required: true,
     },
   },
-  style: style.toString(),
+  viewerStyle: viewerStyle.toString(),
+  rotateWrapperStyle: rotateWrapperStyle.toString(),
   components: {
     IFrame,
+    RotateWrapper,
   },
   data() {
     return {
@@ -87,6 +109,8 @@ export default {
       viewerContentHeight: 0,
       viewportHeight: 0,
       viewportWidth: 0,
+      imageList: [],
+      viewerImageList: [],
     }
   },
   computed: {
@@ -124,11 +148,6 @@ export default {
           }
         : {}
     },
-    thumbnailStyle() {
-      return {
-        transform: `rotate(${this.rotate}deg)`,
-      }
-    },
   },
   watch: {
     isFullpage(n, o) {
@@ -163,6 +182,7 @@ export default {
     this.render()
   },
   mounted() {
+    this.$refs.iframe.appendStyle(this.$options.rotateWrapperStyle)
     // TODO: element resize replace window resize with Observe
     this.handleResize = throttle(() => {
       this.viewportHeight = this.$refs.container.clientHeight
@@ -260,47 +280,43 @@ export default {
         return
       }
       try {
+        this.$emit('update:isRendering', true)
         await this.$nextTick()
 
-        await Promise.all(
-          this.pages.map(async (pageNum, i) => {
-            const page = await this.pdf.getPage(pageNum)
-            const pageWidth = page.view[2]
-            const containerWidth = this.$el.clientWidth
-            const targetWidth = containerWidth * 0.9
-            const scale = targetWidth / pageWidth
-            // const scale = Math.ceil(this.$el.clientWidth / page.view[2]) + 1
+        const blobs = await getPageBlobList(this.pages, this.pdf)
 
-            const viewport = page.getViewport({
-              scale: scale,
-            })
-            // render viewer
-            const viewerCanvas = this.$refs.viewerCanvas[i]
-            viewerCanvas.width = viewport.width
-            viewerCanvas.height = viewport.height
+        const getImage = blobData => {
+          const image = document.createElement('img')
+          image.className = 'placeholder'
+          image.src = URL.createObjectURL(blobData.blob)
 
-            const renderViewer = page.render({
-              canvasContext: viewerCanvas.getContext('2d'),
-              viewport,
-            }).promise
+          return image
+        }
 
-            // render catalog
-            const catalogScale = 110 / pageWidth
-            const catalogViewport = page.getViewport({
-              scale: catalogScale,
-            })
-            const catalogCanvas = this.$refs.catalogCanvas[i]
-            catalogCanvas.width = catalogViewport.width
-            catalogCanvas.height = catalogViewport.height
+        this.imageList = []
+        const promiseList = blobs.map((blobData, idx) => {
+          const image = getImage(blobData)
+          this.imageList = [...this.imageList, image.src]
+          // const catalogImg = image.cloneNode()
+          // replacePlaceholder(this.$refs.catalogItemContent[idx], catalogImg)
+          const viewerImg = image.cloneNode()
+          this.viewerImageList = [...this.viewerImageList, viewerImg.src]
+          replacePlaceholder(this.$refs.viewerItem[idx], viewerImg)
 
-            const renderCatalog = page.render({
-              canvasContext: catalogCanvas.getContext('2d'),
-              viewport: catalogViewport,
-            })
-            await Promise.all([renderViewer, renderCatalog])
+          // const catalogLoaded = new Promise(resolve => {
+          //   catalogImg.onload = resolve
+          // })
+          const viewerLoaded = new Promise(resolve => {
+            viewerImg.onload = resolve
           })
-        )
+
+          return Promise.all([/*catalogLoaded, */ viewerLoaded])
+        })
+
+        await Promise.all(promiseList)
+
         this.$emit('rendered')
+        this.$emit('update:isRendering', false)
 
         await this.$nextTick()
         this.viewerContentHeight = this.$refs.viewerContent.clientHeight
@@ -315,7 +331,7 @@ export default {
     },
     syncViewerOffset(page) {
       if (this.isScrolling) return
-      this.$refs.viewerCanvas[page - 1].scrollIntoView()
+      this.$refs.viewerItem[page - 1].scrollIntoView()
     },
     syncCatalogOffset(page) {
       const target = this.$refs.catalogItem[page - 1]
