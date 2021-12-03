@@ -42,6 +42,7 @@
             ref="viewerItem"
             v-for="page in pages"
             :key="page"
+            :style="viewerItemStyle"
             class="viewer-item"
           >
             <div :style="viewerStyle">
