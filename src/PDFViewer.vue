@@ -49,6 +49,7 @@
         @loaded="handleLoaded"
         @loading-failed="handleLoadingFailed"
         @rendered="handleDocumentRender"
+        @rendering-failed="handleRenderFailed"
       />
     </div>
   </div>
@@ -73,10 +74,10 @@ export default {
         return [
           'download',
           'print',
-          'double',
-          'fullscreen',
-          'abort',
-          'fullpage',
+          'double', // TODO
+          'fullscreen', // TODO
+          'abort', // TODO
+          'fullpage', // TODO
           'rotate',
           'zoom',
           'catalog',
@@ -200,6 +201,9 @@ export default {
     },
     handleLoadingFailed(e) {
       this.$emit('loading-failed', e)
+    },
+    handleRenderFailed(e) {
+      this.$emit('rendering-failed', e)
     },
     reload() {
       this.$refs.viewer.load()
