@@ -74,7 +74,7 @@ module.exports = [
     output: {
       filename: 'vue2-pdf-viewer.js',
       library: {
-        name: 'vue-pdf-viewer',
+        name: 'pdf-viewer-vue',
         type: 'umd',
       },
     },
@@ -85,7 +85,7 @@ module.exports = [
     output: {
       filename: 'vue3-pdf-viewer.js',
       library: {
-        name: 'vue-pdf-viewer',
+        name: 'pdf-viewer-vue',
         type: 'umd',
       },
     },

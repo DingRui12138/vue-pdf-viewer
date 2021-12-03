@@ -1,4 +1,4 @@
-# 📄 vue-pdf-viewer
+# 📄 pdf-viewer-vue
 
   
 
@@ -28,7 +28,7 @@ Depending on the environment, the package can be installed in one of the followi
 
 ```shell
 
-npm install vue-pdf-viewer
+npm install pdf-viewer-vue
 
 ```
 
@@ -36,7 +36,7 @@ npm install vue-pdf-viewer
 
 ```shell
 
-yarn add vue-pdf-viewer
+yarn add pdf-viewer-vue
 
 ```
 
@@ -44,7 +44,7 @@ yarn add vue-pdf-viewer
 
 ```html
 
-<script src="https://unpkg.com/vue-pdf-viewer"></script>
+<script src="https://unpkg.com/pdf-viewer-vue"></script>
 
 ```
 
@@ -78,10 +78,10 @@ yarn add vue-pdf-viewer
 </template>
 
 <script>
-import PDFViewer from 'vue-pdf-viewer'
+import PDFViewer from 'pdf-viewer-vue'
 
 // OR THE FOLLOWING IMPORT FOR VUE 2
-// import PDFViewer from 'vue-pdf-viewer/dist/vue2-pdf-viewer'
+// import PDFViewer from 'pdf-viewer-vue/dist/vue2-pdf-viewer'
 
 export default {
   components: {
