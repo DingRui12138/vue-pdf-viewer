@@ -22,7 +22,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .icon-btn {
   margin-inline-start: 4px;
   width: 36px;

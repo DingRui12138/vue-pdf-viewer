@@ -237,7 +237,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .header__preview {
   --page-length-digits: 1;
   display: flex;

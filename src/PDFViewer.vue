@@ -224,7 +224,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .icon-btn {
   width: 36px;
   height: 36px;
