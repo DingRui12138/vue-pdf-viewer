@@ -4,11 +4,8 @@
 
 PDF viewer component for Vue 2 and Vue 3
 
-```
-TODO: shields.io
-```
+[![npm](https://img.shields.io/npm/v/pdf-viewer-vue)](https://npmjs.com/package/pdf-viewer-vue)[![npm](https://img.shields.io/npm/dw/pdf-viewer-vue)](https://npmjs.com/package/pdf-viewer-vue)[![Github Repo stars](https://img.shields.io/github/stars/DingRui12138/vue-pdf-viewer)](https://github.com/DingRui12138/vue-pdf-viewer)[![npm](https://img.shields.io/npm/l/pdf-viewer-vue)](https://github.com/DingRui12138/vue-pdf-viewer/blob/master/LICENSE)
 
-  
 
 ## Compatibility
 
@@ -105,11 +102,14 @@ export default {
 
 ### Props
 
-  | Name     | Type       | Accepted values                                                                                                 | Description        |
-  | -------- | ---------- | --------------------------------------------------------------------------------------------------------------- | ------------------ |
-  | source   | `string`   | document `URL` or `Base64`                                                                                      | source of document |
-  | controls | `string[]` | `[`<br/>`'download',`<br/>`'print',`<br/>`'rotate',`<br/>`'zoom',`<br/>`'catalog',`<br/>`'switchPage',`<br/>`]` | visible controls   |
-  |          |            |                                                                                                                 |                    |
+  | Name           | Type       | Accepted values                                                                                                 | Description        |
+  | -------------- | ---------- | --------------------------------------------------------------------------------------------------------------- | ------------------ |
+  | source         | `string`   | document `URL` or `Base64`                                                                                      | source of document |
+  | controls       | `string[]` | `[`<br/>`'download',`<br/>`'print',`<br/>`'rotate',`<br/>`'zoom',`<br/>`'catalog',`<br/>`'switchPage',`<br/>`]` | visible controls   |
+  | loading-text   | `string`   | -                                                                                                               | loading text       |
+  | rendering-text | `string`   | -                                                                                                               | rendering text     | 
+
+
 
 
   
