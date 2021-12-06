@@ -207,7 +207,7 @@ export default {
   methods: {
     printPDF() {
       const contentWindow = this.$refs.iframe.getContentWindow()
-      contentWindow?.print()
+      contentWindow.print()
     },
     updateZoomFullpage() {
       const perViewerHeight = this.viewerContentHeight / this.total
