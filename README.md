@@ -4,7 +4,7 @@
 
 PDF viewer component for Vue 2 and Vue 3
 
-[![npm](https://img.shields.io/npm/v/pdf-viewer-vue)](https://npmjs.com/package/pdf-viewer-vue)[![npm](https://img.shields.io/npm/dw/pdf-viewer-vue)](https://npmjs.com/package/pdf-viewer-vue)[![Github Repo stars](https://img.shields.io/github/stars/DingRui12138/vue-pdf-viewer)](https://github.com/DingRui12138/vue-pdf-viewer)[![npm](https://img.shields.io/npm/l/pdf-viewer-vue)](https://github.com/DingRui12138/vue-pdf-viewer/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/pdf-viewer-vue)](https://npmjs.com/package/pdf-viewer-vue) [![npm](https://img.shields.io/npm/dw/pdf-viewer-vue)](https://npmjs.com/package/pdf-viewer-vue) [![Github Repo stars](https://img.shields.io/github/stars/DingRui12138/vue-pdf-viewer)](https://github.com/DingRui12138/vue-pdf-viewer) [![npm](https://img.shields.io/npm/l/pdf-viewer-vue)](https://github.com/DingRui12138/vue-pdf-viewer/blob/master/LICENSE)
 
 
 ## Compatibility
