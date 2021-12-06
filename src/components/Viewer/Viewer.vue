@@ -75,7 +75,10 @@ import getPageBlobList from './getPageBlobList.js'
 import RotateWrapper from '../RotateWrapper/RotateWrapper.vue'
 import rotateWrapperStyle from '!!css-loader!!sass-loader!../RotateWrapper/RotateWrapper.scss'
 
-const VUE_VERSION = Number(version.split('.')[0])
+/**
+ * vue version > 3.0 has version property
+ */
+const VUE_VERSION = Number((version || '2.6').split('.')[0])
 PDF.GlobalWorkerOptions.workerPort = new PDFWorker()
 
 const MARGIN_OFFSET = 20
@@ -308,7 +311,9 @@ export default {
           // replacePlaceholder(this.$refs.catalogItemContent[idx], catalogImg)
           this.viewerImageList = [...this.viewerImageList, url]
 
-          replacePlaceholder(this.$refs[`viewerItem_${idx}`], viewerImg)
+          const refs = this.$refs[`viewerItem_${idx}`]
+          const target = Array.isArray(refs) ? refs[0] : refs
+          replacePlaceholder(target, viewerImg)
 
           // const catalogLoaded = new Promise(resolve => {
           //   catalogImg.onload = resolve
@@ -328,6 +333,9 @@ export default {
         await this.$nextTick()
         this.viewerContentHeight = this.$refs.viewerContent.clientHeight
       } catch (e) {
+        if (e instanceof Error) {
+          console.error('rendering failed:', e)
+        }
         this.pdf = null
         this.$emit('rendering-failed', e)
       }
@@ -338,10 +346,14 @@ export default {
     },
     syncViewerOffset(page) {
       if (this.isScrolling) return
-      this.$refs[`viewerItem_${page - 1}`].scrollIntoView()
+
+      const refs = this.$refs[`viewerItem_${page - 1}`]
+      const target = Array.isArray(refs) ? refs[0] : refs
+      target.scrollIntoView()
     },
     syncCatalogOffset(page) {
-      const target = this.$refs[`catalogItem_${page - 1}`]
+      const refs = this.$refs[`catalogItem_${page - 1}`]
+      const target = Array.isArray(refs) ? refs[0] : refs
 
       target.scrollIntoView({
         block: 'nearest',
