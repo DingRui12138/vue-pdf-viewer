@@ -3,14 +3,16 @@
     <div class="pdf-viewer__header" :class="{ 'not-ready': !isReady }">
       <ViewerPageSelector
         :total="total"
-        :page.sync="page"
+        :page="page"
         :zoom="zoom"
         :controls="controls"
-        :rotate.sync="rotate"
+        :rotate="rotate"
         :isFullpage="isFullpage"
         :filename="filename"
         :isReady="isReady"
         @toggleFullpage="handleToggleFullpage"
+        @update:page="v => (page = v)"
+        @update:rotate="v => (rotate = v)"
         @update:zoom="handleUpdateZoom"
         @toggleCatalog="handleToggleCatalog"
         @print="handlePrint"
@@ -34,17 +36,19 @@
       <Viewer
         ref="viewer"
         :source="source"
-        :page.sync="page"
+        :page="page"
         :total="total"
         :zoom="zoom"
         :catalogVisible="catalogVisible"
         :rotate="rotate"
         :style="viewerStyle"
         :isFullpage="isFullpage"
-        :filename.sync="filename"
+        :filename="filename"
+        @update:page="v => (page = v)"
         @update:zoom="handleUpdateZoom"
         @update:isLoading="handleUpdateLoadingState"
         @update:isRendering="handleUpdateRenderingState"
+        @update:filename="v => (filename = v)"
         @password-requested="handlePasswordRequest"
         @loaded="handleLoaded"
         @loading-failed="handleLoadingFailed"
@@ -85,6 +89,14 @@ export default {
         ]
       },
     },
+    loadingText: {
+      type: String,
+      default: 'Loading',
+    },
+    renderingText: {
+      type: String,
+      default: 'Rendering',
+    },
   },
   components: {
     Viewer,
@@ -112,10 +124,10 @@ export default {
       return [this.isLoading, this.isRendering]
     },
     loadingContent() {
-      return `${this.loadingText || 'Loading'} ${this.dotText}`
+      return `${this.loadingText} ${this.dotText}`
     },
     renderingContent() {
-      return `${this.renderingText || 'Rendering'} ${this.dotText}`
+      return `${this.renderingText} ${this.dotText}`
     },
     dotText() {
       const len = (this.seconds % 3) + 1
@@ -161,7 +173,7 @@ export default {
       })
     },
     handlePrint() {
-      this.$refs.viewer.print()
+      this.$refs.viewer.printPDF()
     },
     handlePreventDefault(evt) {
       evt.preventDefault()

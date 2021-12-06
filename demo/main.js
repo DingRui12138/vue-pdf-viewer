@@ -1,8 +1,12 @@
-import Vue from 'vue'
+import Vue, { createApp } from 'vue'
 
 import App from './App.vue'
 
-new Vue({
-  el: '#app',
-  render: (h) => h(App),
-})
+if (typeof createApp === 'function') {
+  createApp(App).mount('#app')
+} else {
+  new Vue({
+    el: '#app',
+    render: h => h(App),
+  })
+}

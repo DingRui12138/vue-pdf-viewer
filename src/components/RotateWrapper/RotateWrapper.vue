@@ -2,13 +2,13 @@
   <div class="rotate-wrapper" :style="loaded && contentStyle">
     <!-- TODO: slot content (MutationObserver) -->
     <img
-      v-if="src"
       class="image"
       ref="img"
       :src="src"
       :style="imageStyle"
-      @load="handleLoaded"
+      @load="handleLoaded('template')"
     />
+    <!-- FIXME: img load event never triggered -->
   </div>
 </template>
 
@@ -16,7 +16,9 @@
 export default {
   name: 'RotateWrapper',
   props: {
-    src: String,
+    src: {
+      type: String,
+    },
     rotateDeg: Number,
     duration: {
       type: Number,
@@ -48,6 +50,23 @@ export default {
     },
   },
   watch: {
+    src: {
+      immediate: true,
+      handler(n) {
+        this.loaded = false
+        if (n) {
+          const image = document.createElement('img')
+          image.src = n
+
+          const tmp = image.cloneNode()
+          // blob src does not fire onload
+          tmp.onload = async () => {
+            await this.$nextTick()
+            this.handleLoaded()
+          }
+        }
+      },
+    },
     async rotateDeg() {
       await this.$nextTick()
       this._timer = setInterval(() => {

@@ -9,6 +9,9 @@ import Iconfont from './Iconfont.vue'
 
 export default {
   name: 'IconButton',
+  // vue3 triggers click event twice
+  // https://github.com/vuejs/vue-next/commit/e1660f4338fbf4d2a434e13193a58e00f844379b
+  inheritAttrs: false,
   components: {
     Iconfont,
   },

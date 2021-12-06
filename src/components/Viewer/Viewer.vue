@@ -1,5 +1,5 @@
 <template>
-  <IFrame :css="$options.viewerStyle" ref="iframe">
+  <CompIFrame :css="$options.viewerStyle" ref="iframe">
     <div class="viewer-container" ref="container">
       <div
         class="scroller catalog"
@@ -10,23 +10,23 @@
       >
         <div class="catalog-container">
           <div
-            ref="catalogItem"
-            v-for="page in pages"
+            :ref="`catalogItem_${idx}`"
+            v-for="(image, idx) in imageList"
             class="catalog-item"
-            :key="page"
+            :key="idx"
           >
             <div>
               <div
                 ref="catalogItemContent"
                 class="catalog-item__content"
-                :class="activePage === page && 'active'"
-                @click="handleSwitchPage(page)"
+                :class="activePage === idx + 1 && 'active'"
+                @click="handleSwitchPage(idx + 1)"
               >
-                <RotateWrapper :src="imageList[page - 1]" :rotateDeg="rotate" />
+                <RotateWrapper :src="image" :rotateDeg="rotate" />
               </div>
             </div>
             <div class="catalog-index">
-              {{ page }}
+              {{ idx + 1 }}
             </div>
           </div>
         </div>
@@ -39,8 +39,8 @@
       >
         <div class="viewer-content" ref="viewerContent">
           <div
-            ref="viewerItem"
-            v-for="page in pages"
+            :ref="`viewerItem_${idx}`"
+            v-for="(page, idx) in pages"
             :key="page"
             :style="viewerItemStyle"
             class="viewer-item"
@@ -60,12 +60,14 @@
         </div>
       </div>
     </div>
-  </IFrame>
+  </CompIFrame>
 </template>
 
 <script>
+import { version } from 'vue'
 import * as PDF from 'pdfjs-dist/es5/build/pdf.js'
 import PDFWorker from 'pdfjs-dist/es5/build/pdf.worker.js'
+import IFrameV3 from '../IFrame/IFrameV3'
 import IFrame from '../IFrame/IFrame.vue'
 import throttle from '../../utils/throttle'
 import viewerStyle from '!!css-loader!!sass-loader!./Viewer.scss'
@@ -73,6 +75,7 @@ import getPageBlobList from './getPageBlobList.js'
 import RotateWrapper from '../RotateWrapper/RotateWrapper.vue'
 import rotateWrapperStyle from '!!css-loader!!sass-loader!../RotateWrapper/RotateWrapper.scss'
 
+const VUE_VERSION = Number(version.split('.')[0])
 PDF.GlobalWorkerOptions.workerPort = new PDFWorker()
 
 const MARGIN_OFFSET = 20
@@ -101,7 +104,7 @@ export default {
   viewerStyle: viewerStyle.toString(),
   rotateWrapperStyle: rotateWrapperStyle.toString(),
   components: {
-    IFrame,
+    CompIFrame: VUE_VERSION === 3 ? IFrameV3 : IFrame,
     RotateWrapper,
   },
   data() {
@@ -199,9 +202,8 @@ export default {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
-    print() {
+    printPDF() {
       const contentWindow = this.$refs.iframe.getContentWindow()
-
       contentWindow?.print()
     },
     updateZoomFullpage() {
@@ -295,14 +297,18 @@ export default {
         }
 
         this.imageList = []
+        this.viewerImageList = []
         const promiseList = blobs.map((blobData, idx) => {
           const image = getImage(blobData)
-          this.imageList = [...this.imageList, image.src]
+          const viewerImg = image.cloneNode()
+          const url = URL.createObjectURL(blobData.blob)
+
+          this.imageList = [...this.imageList, url]
           // const catalogImg = image.cloneNode()
           // replacePlaceholder(this.$refs.catalogItemContent[idx], catalogImg)
-          const viewerImg = image.cloneNode()
-          this.viewerImageList = [...this.viewerImageList, viewerImg.src]
-          replacePlaceholder(this.$refs.viewerItem[idx], viewerImg)
+          this.viewerImageList = [...this.viewerImageList, url]
+
+          replacePlaceholder(this.$refs[`viewerItem_${idx}`], viewerImg)
 
           // const catalogLoaded = new Promise(resolve => {
           //   catalogImg.onload = resolve
@@ -332,10 +338,10 @@ export default {
     },
     syncViewerOffset(page) {
       if (this.isScrolling) return
-      this.$refs.viewerItem[page - 1].scrollIntoView()
+      this.$refs[`viewerItem_${page - 1}`].scrollIntoView()
     },
     syncCatalogOffset(page) {
-      const target = this.$refs.catalogItem[page - 1]
+      const target = this.$refs[`catalogItem_${page - 1}`]
 
       target.scrollIntoView({
         block: 'nearest',
