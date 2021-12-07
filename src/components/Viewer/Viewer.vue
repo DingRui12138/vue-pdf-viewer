@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { version } from 'vue'
+import * as Vue from 'vue'
 import * as PDF from 'pdfjs-dist/es5/build/pdf.js'
 import PDFWorker from 'pdfjs-dist/es5/build/pdf.worker.js'
 import IFrameV3 from '../IFrame/IFrameV3'
@@ -78,7 +78,11 @@ import rotateWrapperStyle from '!!css-loader!!sass-loader!../RotateWrapper/Rotat
 /**
  * vue version > 3.0 has version property
  */
-const VUE_VERSION = Number((version || '2.6').split('.')[0])
+const version =
+  (Vue && (Vue.defalut ? Vue.defalut.version : Vue.version)) ||
+  (window.Vue && window.Vue.version) ||
+  '2.x'
+const VUE_VERSION = Number(version.split('.')[0])
 PDF.GlobalWorkerOptions.workerPort = new PDFWorker()
 
 const MARGIN_OFFSET = 20

@@ -15,7 +15,9 @@ export default {
 
   beforeUpdate() {
     // freezing to prevent unnessessary Reactifiation of vNodes
-    this.iApp.children = Object.freeze(this.$slots.default)
+    if (this.iApp) {
+      this.iApp.children = Object.freeze(this.$slots.default)
+    }
   },
   methods: {
     getContentWindow() {
@@ -63,7 +65,9 @@ export default {
       const el = document.createElement('DIV') // we will mount or nested app to this element
       body.appendChild(el)
 
-      const iApp = new Vue({
+      const Constructor = Vue || window.Vue
+
+      const iApp = new Constructor({
         name: 'iApp',
         // freezing to prevent unnessessary Reactifiation of vNodes
         data: { children: Object.freeze(children) },

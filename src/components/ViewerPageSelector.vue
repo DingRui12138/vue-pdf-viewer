@@ -258,6 +258,7 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-align: left;
     }
     .catalog-icon {
       > svg {
