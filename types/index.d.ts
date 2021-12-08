@@ -1,12 +1,12 @@
-import { VueConstructor } from 'vue';
+import { DefineComponent } from 'vue';
 
 export default VuePdfViewer;
-
-export const VuePdfViewer: VuePdfViewerConstructor;
 
 export interface VuePdfViewerProps {
   source: object | string;
   controls: string[];
+  loadingText: string;
+  renderingText: string;
 }
 export interface VuePdfViewerData {
   isLoading: boolean,
@@ -16,14 +16,9 @@ export interface VuePdfViewerData {
   zoom: number,
   rotate: number,
 }
-export interface VuePdfViewerMethods {
-  handleSwitchPage: (page: number) => void;
-  handleUpdateZoom: (zoom: number) => void;
-  reload: () => void;
-}
 
-export interface VuePdfViewerConstructor extends VueConstructor {
-  props: VuePdfViewerProps;
-  data: () => VuePdfViewerData;
-  methods: VuePdfViewerMethods;
-}
+export const VuePdfViewer: DefineComponent<
+  VuePdfViewerProps,
+  unknown,
+  VuePdfViewerData
+>;

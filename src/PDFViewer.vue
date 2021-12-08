@@ -62,7 +62,6 @@
 <script>
 import './assets/iconfont/iconfont.css'
 import Viewer from './components/Viewer/Viewer.vue'
-// import Viewer from './Viewer.vue'
 import ViewerPageSelector from './components/ViewerPageSelector.vue'
 
 export default {
