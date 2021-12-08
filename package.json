@@ -8,10 +8,11 @@
     "pdf"
   ],
   "main": "dist/vue3-pdf-viewer.js",
-  "types": "types/index.d.ts",
+  "typings": "types/index.d.ts",
   "files": [
     "dist/*",
-    "src/*"
+    "src/*",
+    "types/*"
   ],
   "license": "MIT",
   "author": "Wayne (371377785@qq.com)",
