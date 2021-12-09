@@ -4,9 +4,9 @@ export default VuePdfViewer;
 
 export interface VuePdfViewerProps {
   source: object | string;
-  controls: string[];
-  loadingText: string;
-  renderingText: string;
+  controls?: string[];
+  loadingText?: string;
+  renderingText?: string;
 }
 export interface VuePdfViewerData {
   isLoading: boolean,
