@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import controls, { CATALOG } from './constants/controls'
 import './assets/iconfont/iconfont.css'
 import Viewer from './components/Viewer/Viewer.vue'
 import ViewerPageSelector from './components/ViewerPageSelector.vue'
@@ -74,18 +75,7 @@ export default {
     controls: {
       type: Array,
       default: () => {
-        return [
-          'download',
-          'print',
-          'double', // TODO
-          'fullscreen', // TODO
-          'abort', // TODO
-          'fullpage', // TODO
-          'rotate',
-          'zoom',
-          'catalog',
-          'switchPage',
-        ]
+        return controls
       },
     },
     loadingText: {
@@ -95,6 +85,10 @@ export default {
     renderingText: {
       type: String,
       default: 'Rendering',
+    },
+    settings: {
+      type: Object,
+      default: () => ({}),
     },
   },
   components: {
@@ -163,6 +157,10 @@ export default {
       },
     },
     deep: true,
+  },
+  mounted() {
+    this.zoom = this.settings.defaultZoom || 100
+    this.catalogVisible = this.controls.includes(CATALOG)
   },
   methods: {
     handleDownload() {

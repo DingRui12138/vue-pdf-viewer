@@ -137,7 +137,7 @@ export default {
     viewerStyle() {
       return {
         // height: `${this.zoom / NORMAL_RATIO}%`,
-        width: `${(this.zoom / NORMAL_RATIO / 100) * this.viewportWidth}px`,
+        width: `${(this.zoom / NORMAL_RATIO / 100) * this.viewportWidth - 40}px`,
         transform: `rotate(${this.rotate}deg)`,
       }
     },
@@ -158,6 +158,9 @@ export default {
             }px`,
           }
         : {}
+    },
+    verticalPadding() {
+      return (this.viewportWidth / this.viewportHeight) * 0
     },
   },
   watch: {
@@ -184,6 +187,16 @@ export default {
         await this.load()
         this.render()
       },
+    },
+    catalogVisible(n, o) {
+      if (n !== o) {
+        this.viewportWidth = n ? this.viewportWidth - 300 : this.viewportWidth + 300
+      }
+      // setTimeout(() => {
+      //   this.$nextTick(() => {
+      //     this.handleResize()
+      //   })
+      // }, 500)
     },
   },
   activated() {
@@ -214,7 +227,8 @@ export default {
       contentWindow.print()
     },
     updateZoomFullpage() {
-      const perViewerHeight = this.viewerContentHeight / this.total
+      const perViewerHeight =
+        (this.viewerContentHeight - this.verticalPadding) / this.total
       const rate = this.viewportHeight / (perViewerHeight - MARGIN_OFFSET)
 
       this.$emit('update:zoom', this.zoom * rate)
@@ -223,7 +237,9 @@ export default {
     handleViewerScroll(evt) {
       this.isScrolling = true
       const yOffset = evt.target.scrollTop
-      const perHeight = (this.viewerContentHeight + MARGIN_OFFSET) / this.total
+      const perHeight =
+        (this.viewerContentHeight + MARGIN_OFFSET - this.verticalPadding) /
+        this.total
       const halfViewportOffset = (perHeight - this.viewportHeight) / 2
 
       const currentPosition = (yOffset - halfViewportOffset) / perHeight + 1
@@ -299,6 +315,9 @@ export default {
           const image = document.createElement('img')
           image.className = 'placeholder'
           image.src = URL.createObjectURL(blobData.blob)
+          image.onload = e => {
+            e.target.naturalWidth
+          }
 
           return image
         }
@@ -333,6 +352,10 @@ export default {
 
         this.$emit('rendered')
         this.$emit('update:isRendering', false)
+
+        if (this.settings?.isFullWidth) {
+          this.$emit('update:zoom', 200)
+        }
 
         await this.$nextTick()
         this.viewerContentHeight = this.$refs.viewerContent.clientHeight

@@ -12,10 +12,10 @@ export const SWITCH_PAGE = 'switchPage'
 export default [
   DOWNLOAD,
   PRINT,
-  DOUBLE,
-  FULLSCREEN,
-  ABOUT,
-  FULLPAGE,
+  DOUBLE, // TODO
+  FULLSCREEN, // TODO
+  ABOUT, // TODO
+  FULLPAGE, // TODO
   ROTATE,
   ZOOM,
   CATALOG,
