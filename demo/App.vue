@@ -6,6 +6,7 @@
       <button @click="handleSwitchUrl('test1')">switch url 1</button>
       <button @click="handleSwitchUrl('test2')">switch url 2</button>
       <button @click="handleSwitchUrl('base64')">switch base64</button>
+      <input accept="application/pdf" type="file" @change="handlePickFile" />
     </div>
     <div style="height: calc(100vh - 30px); width: 80%; margin: 0 auto">
       <PDFViewer
@@ -19,6 +20,17 @@
 
 <script>
 import PDFViewer from '../src/index.js'
+
+function blobToDataURI(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader()
+
+    reader.onload = function (e) {
+      resolve(e.target.result)
+    }
+    reader.readAsDataURL(file)
+  })
+}
 
 const TEST_URL_MAP = {
   test1: 'http://localhost:55703/1.pdf',
@@ -34,6 +46,7 @@ export default {
   data() {
     return {
       pdfSource: TEST_URL_MAP.test2,
+      file: null,
     }
   },
   methods: {
@@ -42,6 +55,33 @@ export default {
     },
     handleDownload(source) {
       alert(`custom download file: ${source}`)
+    },
+    handlePickFile(e) {
+      e = e || window.event
+
+      const file = e.target.files[0]
+
+      blobToDataURI(file).then(data => {
+        this.pdfSource = data
+      })
+
+      // const reader = new FileReader()
+
+      // const rs = reader.readAsArrayBuffer(file)
+
+      // let blob = null
+
+      // reader.onload = e => {
+      //   if (typeof e.target.result === 'object') {
+      //     blob = new Blob([e.target.result])
+      //   } else {
+      //     blob = e.target.result
+      //   }
+      //   console.log(blob)
+      //   const data = Object.prototype.toString.call(blob)
+
+      //   this.pdfSource = `data:application/octet-stream;base64,${blob}`
+      // }
     },
   },
 }
