@@ -64,24 +64,6 @@ export default {
       blobToDataURI(file).then(data => {
         this.pdfSource = data
       })
-
-      // const reader = new FileReader()
-
-      // const rs = reader.readAsArrayBuffer(file)
-
-      // let blob = null
-
-      // reader.onload = e => {
-      //   if (typeof e.target.result === 'object') {
-      //     blob = new Blob([e.target.result])
-      //   } else {
-      //     blob = e.target.result
-      //   }
-      //   console.log(blob)
-      //   const data = Object.prototype.toString.call(blob)
-
-      //   this.pdfSource = `data:application/octet-stream;base64,${blob}`
-      // }
     },
   },
 }
