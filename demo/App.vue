@@ -7,6 +7,7 @@
       <button @click="handleSwitchUrl('test2')">switch url 2</button>
       <button @click="handleSwitchUrl('base64')">switch base64</button>
       <input accept="application/pdf" type="file" @change="handlePickFile" />
+      <button @click="handleTestFetch">test binary</button>
     </div>
     <div style="height: calc(100vh - 30px); width: 80%; margin: 0 auto">
       <PDFViewer
@@ -15,6 +16,8 @@
         :settings="{ defaultZoom: 200 }"
       />
     </div>
+
+    <!-- <iframe :src="pdfSource" /> -->
   </div>
 </template>
 
@@ -50,6 +53,41 @@ export default {
     }
   },
   methods: {
+    handleTestFetch() {
+      fetch('http://localhost:3000/pdf', {
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
+      }).then(res => {
+        const reader = res.body.getReader()
+        const stream = new ReadableStream({
+          start(controller) {
+            function push() {
+              reader.read().then(({ done, value }) => {
+                if (done) {
+                  controller.close()
+                  return
+                }
+
+                controller.enqueue(value)
+                push()
+              })
+            }
+
+            push()
+          },
+        })
+
+        const data = new Response(stream, {
+          headers: { 'Content-Type': 'application/pdf' },
+        })
+        data.blob().then(blob => {
+          blobToDataURI(blob).then(data => {
+            this.pdfSource = data
+          })
+        })
+      })
+    },
     handleSwitchUrl(key) {
       this.pdfSource = TEST_URL_MAP[key]
     },
@@ -61,9 +99,8 @@ export default {
 
       const file = e.target.files[0]
 
-      blobToDataURI(file).then(data => {
-        this.pdfSource = data
-      })
+      const url = URL.createObjectURL(file)
+      this.pdfSource = url
     },
   },
 }
