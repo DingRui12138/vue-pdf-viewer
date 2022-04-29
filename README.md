@@ -81,6 +81,7 @@ export default {
 | loading-text   | `string`                  | -                                                                                                               | loading text       |
 | rendering-text | `string`                  | -                                                                                                               | rendering text     |
 | settings       | `{ defaultZoom: number }` | -                                                                                                               | default settings   |
+| filename       | `string`                  | `null`                                                                                                          | display filename   |
 
 ### Events
 
