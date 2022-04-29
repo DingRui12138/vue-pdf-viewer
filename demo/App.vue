@@ -12,8 +12,8 @@
     <div style="height: calc(100vh - 30px); width: 80%; margin: 0 auto">
       <PDFViewer
         :source="pdfSource"
-        @download="handleDownload"
         :settings="{ defaultZoom: 200 }"
+        @download="handleDownload"
       />
     </div>
 

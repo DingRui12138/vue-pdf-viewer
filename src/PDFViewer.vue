@@ -8,7 +8,7 @@
         :controls="controls"
         :rotate="rotate"
         :isFullpage="isFullpage"
-        :filename="filename"
+        :filename="displayFilename"
         :isReady="isReady"
         @toggleFullpage="handleToggleFullpage"
         @update:page="v => (page = v)"
@@ -43,12 +43,11 @@
         :rotate="rotate"
         :style="viewerStyle"
         :isFullpage="isFullpage"
-        :filename="filename"
         @update:page="v => (page = v)"
         @update:zoom="handleUpdateZoom"
         @update:isLoading="handleUpdateLoadingState"
         @update:isRendering="handleUpdateRenderingState"
-        @update:filename="v => (filename = v)"
+        @update:filename="v => (tmpFilename = v)"
         @password-requested="handlePasswordRequest"
         @loaded="handleLoaded"
         @loading-failed="handleLoadingFailed"
@@ -90,6 +89,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    filename: {
+      type: String,
+      default: null,
+    },
   },
   components: {
     Viewer,
@@ -105,11 +108,14 @@ export default {
       zoom: 100,
       rotate: 0,
       isFullpage: false,
-      filename: '',
+      tmpFilename: '',
       seconds: 0,
     }
   },
   computed: {
+    displayFilename() {
+      return this.filename || this.tmpFilename
+    },
     isReady() {
       return !this.isLoading && !this.isRendering
     },
