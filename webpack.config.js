@@ -10,9 +10,25 @@ const baseConfig = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.m?js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
+        options: {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                targets: {
+                  edge: '17',
+                  firefox: '60',
+                  chrome: '67',
+                  safari: '11.1',
+                },
+                useBuiltIns: 'usage',
+              },
+            ],
+          ], //Preset used for env setup
+        },
       },
       {
         test: /\.vue$/,
